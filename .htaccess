@@ -1,0 +1,23 @@
+Options -Indexes
+
+# PWA manifest uchun to'g'ri MIME turi
+<IfModule mod_mime.c>
+    AddType application/manifest+json .webmanifest
+</IfModule>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # Himoyalangan fayllar
+    RewriteRule ^(bootstrap|config)\.php$ - [F,L]
+    RewriteRule ^core/ - [F,L]
+    RewriteRule ^models/ - [F,L]
+    RewriteRule ^storage/ - [F,L]
+    RewriteRule ^database/ - [F,L]
+
+    # API yo'naltirish
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^api/v1/([a-z_]+)$ api/v1/$1.php [L]
+</IfModule>

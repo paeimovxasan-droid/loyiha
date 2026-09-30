@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#020d07">
+<title>Tortinmang</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* 🟢 Yashil-Neon rang sxemasi */
+  --bg:#020d07;--bg2:#041a0c;--s1:rgba(0,255,136,.04);--s2:rgba(0,255,136,.02);
+  --b1:rgba(0,255,136,.12);--b2:rgba(0,255,136,.07);
+  --p:#00ff88;--p2:#00d4a0;--p3:rgba(0,255,136,.15);
+  --c:#00d4ff;--g:#00ff88;--y:#f0c040;--r:#ef4444;--pk:#00ffcc;
+  --t1:#e8fff4;--t2:#6ee7b7;--t3:#2d6b50;
+  --r8:12px;--r12:16px;--r16:20px;--r24:28px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:var(--bg)}
+body{font-family:'Inter',sans-serif;color:var(--t1);font-size:14px;overscroll-behavior:none}
+
+/* BG MESH — yashil-neon tumanlar */
+body::before{content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse 80% 50% at 20% -10%,rgba(0,255,136,.13) 0%,transparent 60%),
+             radial-gradient(ellipse 60% 40% at 80% 100%,rgba(0,212,255,.10) 0%,transparent 55%),
+             radial-gradient(ellipse 50% 40% at 50% 50%,rgba(0,255,136,.05) 0%,transparent 70%);
+  pointer-events:none;z-index:0}
+
+/* ROOT */
+#root{position:relative;z-index:1;height:100%;display:flex;flex-direction:column;max-width:480px;margin:0 auto}
+#pages{flex:1;overflow-y:auto;overflow-x:hidden;padding:0 0 90px;scroll-behavior:smooth}
+#pages::-webkit-scrollbar{display:none}
+
+/* CARDS */
+.card{background:var(--s1);border:1px solid var(--b1);border-radius:var(--r16);padding:16px;margin-bottom:10px;backdrop-filter:blur(12px)}
+.card-hi{background:linear-gradient(135deg,rgba(0,255,136,.10),rgba(0,212,255,.05));border-color:rgba(0,255,136,.22)}
+.card-g{background:linear-gradient(135deg,rgba(0,255,136,.10),rgba(0,255,136,.04));border-color:rgba(0,255,136,.2)}
+.card-y{background:linear-gradient(135deg,rgba(240,192,64,.10),rgba(240,192,64,.04));border-color:rgba(240,192,64,.2)}
+
+/* PAGE */
+.page{display:none;animation:fadeUp .22s ease;padding:0 16px}
+.page.on{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* BOTTOM NAV */
+nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;
+  background:rgba(2,13,7,.94);backdrop-filter:blur(24px);border-top:1px solid var(--b1);
+  display:grid;grid-template-columns:1fr 1fr 68px 1fr 1fr;align-items:center;
+  padding:8px 4px max(10px,env(safe-area-inset-bottom));z-index:100}
+.ni{display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 8px;
+  cursor:pointer;color:var(--t3);font-size:9px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;transition:color .2s}
+.ni svg{width:22px;height:22px;transition:all .2s}
+.ni.on{color:var(--p)}
+.ni.on svg{filter:drop-shadow(0 0 6px var(--p))}
+.nc{width:52px;height:52px;border-radius:50%;
+  background:linear-gradient(135deg,var(--p),var(--p2));
+  display:flex;align-items:center;justify-content:center;
+  margin-top:-18px;cursor:pointer;box-shadow:0 4px 20px rgba(0,255,136,.45);transition:transform .18s}
+.nc:active{transform:scale(.92)}
+.nc svg{width:24px;height:24px}
+
+/* HEADER */
+.hdr{padding:20px 16px 12px;position:relative}
+.hdr-brand{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.hdr-logo{width:36px;height:36px}
+.hdr-name{font-size:20px;font-weight:900;letter-spacing:-.5px;
+  background:linear-gradient(135deg,#00ff88,#00ffcc,#00d4ff);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.hdr-bal{font-size:42px;font-weight:900;color:#fff;letter-spacing:-2px;line-height:1}
+.hdr-bal-label{font-size:12px;color:var(--t2);margin-top:6px;font-weight:500}
+.hdr-meta{display:flex;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap}
+
+/* BADGES */
+.chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+.chip svg{width:12px;height:12px}
+.chip-purple{background:rgba(0,255,136,.15);color:#00ff88;border:1px solid rgba(0,255,136,.25)}
+.chip-green{background:rgba(0,255,136,.15);color:#86efac;border:1px solid rgba(0,255,136,.2)}
+.chip-yellow{background:rgba(240,192,64,.15);color:#fde68a;border:1px solid rgba(240,192,64,.2)}
+.chip-cyan{background:rgba(0,212,255,.15);color:#67e8f9;border:1px solid rgba(0,212,255,.2)}
+.chip-pink{background:rgba(0,255,204,.15);color:#99ffee;border:1px solid rgba(0,255,204,.2)}
+
+/* SERVICE GRID */
+.svc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:4px 0 10px}
+.svc{display:flex;flex-direction:column;align-items:center;gap:6px;
+  cursor:pointer;padding:12px 4px;border-radius:var(--r12);
+  background:var(--s2);border:1px solid var(--b2);
+  transition:all .18s}
+.svc:active{transform:scale(.91);background:var(--s1)}
+.svc-ico{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center}
+.svc-ico svg{width:22px;height:22px}
+.svc-lbl{font-size:10px;color:var(--t2);font-weight:600;letter-spacing:.2px}
+
+/* ICON BG COLORS — neon ranglar */
+.ic-p{background:linear-gradient(135deg,#006633,#00cc66)}
+.ic-c{background:linear-gradient(135deg,#005566,#00aacc)}
+.ic-g{background:linear-gradient(135deg,#004d22,#00aa55)}
+.ic-y{background:linear-gradient(135deg,#7a5c00,#d4a017)}
+.ic-pk{background:linear-gradient(135deg,#005544,#00cc99)}
+.ic-b{background:linear-gradient(135deg,#003366,#0066cc)}
+.ic-r{background:linear-gradient(135deg,#660022,#cc0044)}
+.ic-t{background:linear-gradient(135deg,#004d40,#00897b)}
+
+/* STAT ROW */
+.sr{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--b2)}
+.sr:last-child{border:none}
+.sl{color:var(--t2);font-size:13px;display:flex;align-items:center;gap:6px}
+.sl svg{width:14px;height:14px;opacity:.6}
+.sv{color:var(--t1);font-weight:600;font-size:13px}
+
+/* SECTION TITLE */
+.st{font-size:13px;font-weight:700;color:var(--t1);letter-spacing:.2px;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.st svg{width:16px;height:16px;color:var(--p)}
+
+/* BTNS */
+.btn{display:flex;align-items:center;justify-content:center;gap:7px;padding:13px 20px;
+  border:none;border-radius:var(--r12);font-size:14px;font-weight:600;
+  cursor:pointer;transition:all .18s;width:100%;font-family:inherit}
+.btn svg{width:18px;height:18px}
+.btn:active{transform:scale(.97)}
+.btn-p{background:linear-gradient(135deg,var(--p),var(--p2));color:#021a0c;box-shadow:0 4px 20px rgba(0,255,136,.35)}
+.btn-g{background:linear-gradient(135deg,#006633,#00cc66);color:#fff;box-shadow:0 4px 14px rgba(0,255,136,.25)}
+.btn-o{background:transparent;border:1px solid var(--b1);color:var(--t1)}
+.btn-sm{padding:8px 14px;font-size:12px;border-radius:10px;width:auto}
+
+/* INPUT */
+.inp{width:100%;padding:13px 16px;border:1px solid var(--b1);border-radius:var(--r12);
+  background:rgba(0,0,0,.45);color:var(--t1);font-size:14px;font-family:inherit;
+  outline:none;transition:border-color .2s;-webkit-appearance:none;appearance:none}
+.inp:focus{border-color:var(--p)}
+.inp::placeholder{color:var(--t3)}
+select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236ee7b7' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;background-size:20px;padding-right:36px}
+
+/* FEED ITEM */
+.fi{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--b2)}
+.fi:last-child{border:none}
+.fa{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fa svg{width:18px;height:18px}
+.fa-dep{background:rgba(0,255,136,.15);color:var(--g)}
+.fa-wd{background:rgba(0,212,255,.15);color:var(--c)}
+.fn{font-size:13px;color:var(--t1);font-weight:500}
+.fa-amt{font-size:12px;font-weight:700}
+
+/* PACKAGE */
+.pkg{border-radius:var(--r16);padding:16px;margin-bottom:10px;border:1px solid rgba(0,255,136,.18);
+  background:linear-gradient(135deg,rgba(0,255,136,.08),rgba(0,255,136,.03),rgba(0,212,255,.04))}
+.pkg-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.pkg-name{font-size:15px;font-weight:700}
+.pkg-pct{font-size:22px;font-weight:900;color:var(--g);letter-spacing:-1px}
+.pkg-sub{font-size:11px;color:var(--t2)}
+.pkg-row{display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-bottom:4px}
+.pkg-row span:last-child{color:var(--t1);font-weight:500}
+
+/* INVEST ITEM */
+.inv{display:flex;justify-content:space-between;align-items:center;
+  padding:12px;background:rgba(0,255,136,.07);
+  border:1px solid rgba(0,255,136,.15);border-radius:var(--r12);margin-bottom:8px}
+.inv-bar{height:3px;background:rgba(255,255,255,.08);border-radius:4px;margin-top:6px;overflow:hidden}
+.inv-fill{height:100%;background:linear-gradient(90deg,var(--g),var(--c));border-radius:4px}
+
+/* MODAL */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:200;
+  display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px)}
+.modal.on{display:flex}
+.mbox{background:#031208;border:1px solid var(--b1);border-radius:24px 24px 0 0;
+  width:100%;max-width:480px;max-height:90vh;overflow-y:auto;padding:24px;
+  animation:slideUp .28s cubic-bezier(.4,0,.2,1)}
+.mbox::-webkit-scrollbar{display:none}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.mhdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.mttl{font-size:17px;font-weight:700;display:flex;align-items:center;gap:8px}
+.mttl svg{width:20px;height:20px;color:var(--p)}
+.mcls{width:30px;height:30px;border-radius:50%;background:rgba(0,255,136,.08);
+  border:none;color:var(--t2);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.mcls svg{width:16px;height:16px}
+
+/* TOAST */
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);
+  padding:11px 18px;border-radius:12px;font-size:13px;font-weight:600;
+  z-index:500;white-space:nowrap;animation:toastIn .25s ease;
+  display:flex;align-items:center;gap:8px;max-width:90%}
+.toast svg{width:16px;height:16px;flex-shrink:0}
+.t-ok{background:#033d1a;border:1px solid #00cc66;color:#a7f3d0}
+.t-err{background:#7f1d1d;border:1px solid #dc2626;color:#fecaca}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(-10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+/* CONFETTI */
+.cf{position:fixed;inset:0;pointer-events:none;z-index:400;overflow:hidden}
+.cp{position:absolute;width:7px;height:7px;top:-20px;animation:cfDrop 3s linear forwards}
+@keyframes cfDrop{to{transform:translateY(105vh) rotate(720deg);opacity:0}}
+
+/* SPINNER */
+.spin-w{display:flex;justify-content:center;padding:36px}
+.spin-w::after{content:'';width:26px;height:26px;border:2.5px solid var(--b1);
+  border-top-color:var(--p);border-radius:50%;animation:rot 1s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
+
+/* EMPTY */
+.empty{text-align:center;padding:40px 16px;color:var(--t2)}
+.empty svg{width:48px;height:48px;margin:0 auto 12px;display:block;opacity:.35}
+
+/* PROGRESS BAR */
+.lvl-bar{height:5px;background:rgba(0,255,136,.08);border-radius:4px;overflow:hidden;margin-top:6px}
+.lvl-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--p),var(--c));transition:width .5s ease}
+
+/* REF LINK */
+.ref-row{display:flex;gap:8px;align-items:center}
+.ref-val{flex:1;background:rgba(0,0,0,.4);border:1px solid var(--b1);border-radius:10px;
+  padding:10px 12px;color:var(--t2);font-size:11px;font-family:monospace;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* DIVIDER */
+.div{height:1px;background:var(--b1);margin:12px 0}
+
+/* VIP CARD */
+.vip-card{border-radius:var(--r16);padding:16px;margin-bottom:10px;border:1px solid;transition:transform .18s}
+.vip-card:active{transform:scale(.98)}
+.vip-silver{background:linear-gradient(135deg,rgba(110,231,183,.08),rgba(110,231,183,.03));border-color:rgba(110,231,183,.22)}
+.vip-gold{background:linear-gradient(135deg,rgba(240,192,64,.10),rgba(240,192,64,.04));border-color:rgba(240,192,64,.28)}
+.vip-diamond{background:linear-gradient(135deg,rgba(0,212,255,.10),rgba(0,255,136,.07));border-color:rgba(0,212,255,.28)}
+.vip-active{box-shadow:0 0 0 2px rgba(0,255,136,.5)}
+
+/* PAGE HEADER */
+.pg-hdr{padding:20px 0 12px}
+.pg-ttl{font-size:20px;font-weight:900;letter-spacing:-.5px;display:flex;align-items:center;gap:8px;
+  background:linear-gradient(135deg,#00ff88,#00ffcc,#00d4ff);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.pg-ttl svg{-webkit-text-fill-color:unset}
+
+/* ANIM-IN */
+.anim-in{animation:fadeUp .2s ease both}
+.anim-in:nth-child(2){animation-delay:.05s}
+.anim-in:nth-child(3){animation-delay:.1s}
+.anim-in:nth-child(4){animation-delay:.15s}
+.anim-in:nth-child(5){animation-delay:.2s}
+.anim-in:nth-child(6){animation-delay:.25s}
+
+/* WHEEL */
+.wheel-wrap{display:flex;justify-content:center;margin:8px 0}
+.wheel{display:inline-block;filter:drop-shadow(0 0 24px rgba(0,255,136,.5));transition:none}
+.wheel.spinning{transition:transform 3s cubic-bezier(.17,.67,.12,1)}
+
+/* AVATAR SVG */
+.avatar-svg{width:80px;height:80px;margin:0 auto;border-radius:50%;overflow:hidden;
+  box-shadow:0 0 0 3px rgba(0,255,136,.35),0 0 24px rgba(0,255,136,.2)}
+
+/* GLOW PULSE (for active nav item) */
+@keyframes glowPulse{0%,100%{filter:drop-shadow(0 0 4px var(--p))}50%{filter:drop-shadow(0 0 12px var(--p))}}
+.ni.on svg{animation:glowPulse 2.5s ease-in-out infinite}
+
+/* BALANCE COUNT-UP */
+@keyframes countUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.hdr-bal{animation:countUp .4s ease}
+
+/* SHINE SWEEP on header */
+.hdr::after{content:'';position:absolute;inset:0;border-radius:0 0 var(--r24) var(--r24);
+  background:linear-gradient(105deg,transparent 40%,rgba(0,255,136,.05) 50%,transparent 60%);
+  background-size:200% 100%;animation:shine 4s ease-in-out infinite}
+@keyframes shine{0%,100%{background-position:200% 0}50%{background-position:-200% 0}}
+
+/* FLOATING PARTICLES (bg) */
+.particle{position:fixed;border-radius:50%;pointer-events:none;z-index:0;
+  animation:floatUp linear infinite;opacity:0}
+@keyframes floatUp{0%{transform:translateY(100vh) scale(0);opacity:0}
+  10%{opacity:.6}90%{opacity:.2}100%{transform:translateY(-20px) scale(1);opacity:0}}
+
+/* NAV center button pulse */
+@keyframes navPulse{0%,100%{box-shadow:0 4px 20px rgba(0,255,136,.45)}
+  50%{box-shadow:0 4px 30px rgba(0,255,136,.75),0 0 0 6px rgba(0,255,136,.1)}}
+.nc{animation:navPulse 3s ease-in-out infinite}
+
+/* TASK done strikethrough */
+.task-done .fn{text-decoration:line-through;opacity:.5}
+</style>
+</head>
+<body>
+<div id="root">
+  <div id="pages">
+    <div class="page on" id="p-home"></div>
+    <div class="page" id="p-invest" style="padding:0 16px"></div>
+    <div class="page" id="p-wallet" style="padding:0 16px"></div>
+    <div class="page" id="p-ref" style="padding:0 16px"></div>
+    <div class="page" id="p-profile" style="padding:0 16px"></div>
+  </div>
+
+  <nav>
+    <div class="ni on" data-p="home" onclick="go('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>Bosh</span>
+    </div>
+    <div class="ni" data-p="invest" onclick="go('invest')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+      <span>Invest</span>
+    </div>
+    <div class="nc" onclick="go('wallet')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="3"/><path d="M16 3H8L2 7h20l-6-4z"/><circle cx="16" cy="14" r="1.5" fill="white" stroke="none"/></svg>
+    </div>
+    <div class="ni" data-p="ref" onclick="go('ref')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+      <span>Referal</span>
+    </div>
+    <div class="ni" data-p="profile" onclick="go('profile')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span>Profil</span>
+    </div>
+  </nav>
+</div>
+
+<!-- MODALS -->
+<div class="modal" id="m-deposit">
+  <div class="mbox">
+    <div class="mhdr">
+      <span class="mttl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="3"/><path d="M16 3H8L2 7h20z"/></svg>Depozit kiritish</span>
+      <button class="mcls" onclick="closeModal('deposit')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div id="m-dep-info"></div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:14px">
+      <select id="d-ctype" class="inp">
+        <option value="uzcard">Uzcard</option>
+        <option value="humo">Humo</option>
+      </select>
+      <input id="d-amount" class="inp" type="number" placeholder="Summa (so'm)">
+      <input id="d-receipt" class="inp" type="text" placeholder="Tranzaksiya ID / Chek raqami">
+      <button class="btn btn-p" onclick="submitDeposit()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        Tasdiqlash
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="m-withdraw">
+  <div class="mbox">
+    <div class="mhdr">
+      <span class="mttl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>Pul yechish</span>
+      <button class="mcls" onclick="closeModal('withdraw')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div id="m-wd-info"></div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:14px">
+      <select id="w-ctype" class="inp">
+        <option value="uzcard">Uzcard</option>
+        <option value="humo">Humo</option>
+      </select>
+      <input id="w-card" class="inp" type="text" placeholder="Karta raqami (16 ta raqam)" maxlength="19">
+      <input id="w-amount" class="inp" type="number" placeholder="Summa (so'm)">
+      <button class="btn btn-p" onclick="submitWithdraw()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        Yuborish
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="m-invest">
+  <div class="mbox">
+    <div class="mhdr">
+      <span class="mttl" id="m-inv-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>Investitsiya</span>
+      <button class="mcls" onclick="closeModal('invest')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <input type="hidden" id="m-inv-pkg">
+    <div id="m-inv-detail"></div>
+    <input class="inp" id="m-inv-amount" type="number" placeholder="Summa kiriting (so'm)" style="margin:12px 0">
+    <div id="m-inv-calc" style="margin-bottom:14px"></div>
+    <button class="btn btn-p" onclick="submitInvest()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      Investitsiya qilish
+    </button>
+  </div>
+</div>
+
+<div class="modal" id="m-tasks">
+  <div class="mbox">
+    <div class="mhdr">
+      <span class="mttl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>Vazifalar</span>
+      <button class="mcls" onclick="closeModal('tasks')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div id="m-tasks-list"><div class="spin-w"></div></div>
+  </div>
+</div>
+
+<div class="modal" id="m-lottery">
+  <div class="mbox">
+    <div class="mhdr">
+      <span class="mttl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>Omad G'ildiragi</span>
+      <button class="mcls" onclick="closeModal('lottery')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div id="m-lottery-cnt"><div class="spin-w"></div></div>
+  </div>
+</div>
+
+<div class="modal" id="m-vip">
+  <div class="mbox">
+    <div class="mhdr">
+      <span class="mttl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>VIP A'zolik</span>
+      <button class="mcls" onclick="closeModal('vip')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div id="m-vip-cnt"><div class="spin-w"></div></div>
+  </div>
+</div>
+
+<div class="modal" id="m-promo">
+  <div class="mbox">
+    <div class="mhdr">
+      <span class="mttl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg>Promo Kod</span>
+      <button class="mcls" onclick="closeModal('promo')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <input class="inp" id="promo-inp" type="text" placeholder="PROMO KODINGIZ" style="text-transform:uppercase;letter-spacing:1px">
+      <button class="btn btn-p btn-sm" onclick="redeemPromo()" style="flex-shrink:0">Faollashtir</button>
+    </div>
+    <div id="promo-res"></div>
+  </div>
+</div>
+
+<div class="modal" id="m-achievements">
+  <div class="mbox">
+    <div class="mhdr">
+      <span class="mttl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>Yutuqlar</span>
+      <button class="mcls" onclick="closeModal('achievements')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div id="m-ach-cnt"><div class="spin-w"></div></div>
+  </div>
+</div>
+
+<div class="modal" id="m-leaderboard">
+  <div class="mbox">
+    <div class="mhdr">
+      <span class="mttl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>Reyting</span>
+      <button class="mcls" onclick="closeModal('leaderboard')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div id="m-lb-cnt"><div class="spin-w"></div></div>
+  </div>
+</div>
+
+<div class="modal" id="m-news">
+  <div class="mbox">
+    <div class="mhdr">
+      <span class="mttl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h16a2 2 0 002-2V4a2 2 0 00-2-2H8a2 2 0 00-2 2v16a2 2 0 01-2 2zm0 0a2 2 0 01-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6z"/></svg>Yangiliklar</span>
+      <button class="mcls" onclick="closeModal('news')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div id="m-news-list"><div class="spin-w"></div></div>
+  </div>
+</div>
+
+<script src="js/app.js?v=5"></script>
+<script>
+/* Floating background particles */
+(function spawnParticles() {
+  const cols = ['rgba(0,255,136,.5)','rgba(0,212,255,.4)','rgba(0,255,204,.4)','rgba(110,231,183,.3)'];
+  for (let i = 0; i < 14; i++) {
+    const p  = document.createElement('div');
+    p.className = 'particle';
+    const sz = 3 + Math.random() * 5;
+    p.style.cssText = `width:${sz}px;height:${sz}px;left:${Math.random()*100}%;
+      background:${cols[~~(Math.random()*cols.length)]};
+      animation-duration:${8+Math.random()*12}s;
+      animation-delay:${Math.random()*10}s`;
+    document.body.appendChild(p);
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+# Runtime configuration: create from config.example.php on the server.
+/config.php
+
+# Runtime application state
+/storage/logs/*
+!/storage/logs/.gitkeep
+/storage/cache/*
+!/storage/cache/.gitkeep
+
+# User-provided files
+/uploads/*
+!/uploads/.htaccess
+
+# Local tooling
+/.cache/
+/.env
+/.env.*
+!.env.example
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
